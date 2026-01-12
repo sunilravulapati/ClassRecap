@@ -17,7 +17,7 @@ export default function Home() {
           {/* Logo Removed Here */}
           
           <h1 className="text-6xl sm:text-7xl font-extrabold tracking-tight text-slate-900 mb-6">
-            Class<span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Pulse</span>
+            Recall<span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">AI</span>
           </h1>
           
           <p className="text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed font-medium">

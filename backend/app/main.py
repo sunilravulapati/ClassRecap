@@ -8,7 +8,7 @@ from app.models import schema
 
 # Create tables automatically on startup
 schema.Base.metadata.create_all(bind=engine)
-app = FastAPI(title="ClassPulse API")
+app = FastAPI(title="RecallAI API")
 
 app.add_middleware(
     CORSMiddleware,
@@ -47,6 +47,7 @@ app.add_middleware(
 
 app.include_router(upload.router, prefix="/upload", tags=["Upload"])
 app.include_router(student_notes.router, tags=["Student Notes"])
+app.include_router(summary.router, prefix="/summary", tags=["Summary"])
 
 @app.get("/")
 def read_root():

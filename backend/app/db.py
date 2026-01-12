@@ -2,7 +2,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 # SQLite Database URL
-SQLALCHEMY_DATABASE_URL = "sqlite:///./classpulse.db"
+SQLALCHEMY_DATABASE_URL = "sqlite:///./recallai.db"
 
 # Create Engine
 engine = create_engine(

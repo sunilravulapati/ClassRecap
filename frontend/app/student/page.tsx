@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
-import { api } from "@/lib/api"; // Ensure you use your centralized API helper if it exists
+import remarkGfm from "remark-gfm";
 
-// If you don't have @/lib/api, use this simple version:
+// Simple API helper
 const API_BASE = "http://localhost:8000";
 
 const safeApi = {
@@ -51,7 +51,6 @@ export default function StudentPage() {
   const fetchSavedNotes = async () => {
     setIsLoadingHistory(true);
     try {
-      // Use the safeApi defined above
       const res = await safeApi.get("/student-notes/saved");
       setSavedNotes(res.data.saved_notes || []);
     } catch (err) {
@@ -75,7 +74,7 @@ export default function StudentPage() {
         note_type: view === "ai" ? "ai_refined" : "raw"
       });
       alert("✅ Note saved successfully!");
-      fetchSavedNotes(); // Refresh list
+      fetchSavedNotes();
     } catch (error) {
       console.error("Save failed:", error);
       alert("❌ Failed to save.");
@@ -105,8 +104,6 @@ export default function StudentPage() {
     if (!content.trim()) return;
     setStatus("loading");
     try {
-      // Use the /student-notes/save endpoint for raw uploads too
-      // OR specifically /upload if you kept that router separate
       await safeApi.post("/upload", { content });
       setStatus("success");
     } catch (error) {
@@ -120,13 +117,15 @@ export default function StudentPage() {
     alert("📋 Copied!");
   };
 
-  function viewNoteDetail(note: SavedNote): void {
-    throw new Error("Function not implemented.");
-  }
+  // ✅ FIXED: Proper implementation to show modal
+  const viewNoteDetail = (note: SavedNote) => {
+    setSelectedNote(note);
+  };
 
-  function closeNoteDetail(event: MouseEvent<HTMLButtonElement, MouseEvent>): void {
-    throw new Error("Function not implemented.");
-  }
+  // ✅ FIXED: Proper implementation to close modal
+  const closeNoteDetail = () => {
+    setSelectedNote(null);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
@@ -166,6 +165,13 @@ export default function StudentPage() {
           />
 
           <div className="flex flex-col sm:flex-row gap-4 mt-6">
+            <button 
+                onClick={handleSave}
+                disabled={isSaving || !content.trim()}
+                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-lg font-medium transition-all disabled:opacity-50"
+            >
+                {isSaving ? "Saving..." : "💾 Save Draft"}
+            </button>
             <button
               onClick={submit}
               disabled={status === "loading" || !content.trim()}
@@ -252,7 +258,7 @@ export default function StudentPage() {
                       prose-h1:text-2xl prose-h2:text-xl
                       prose-ul:my-2 prose-li:my-0.5 prose-li:text-gray-700
                       text-gray-800">
-                      <ReactMarkdown>{aiNotes}</ReactMarkdown>
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{aiNotes}</ReactMarkdown>
                     </article>
                   ) : (
                     <pre className="whitespace-pre-wrap text-sm text-gray-700 font-sans leading-relaxed">
@@ -331,8 +337,14 @@ export default function StudentPage() {
 
       {/* Note Detail Modal */}
       {selectedNote && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50" onClick={closeNoteDetail}>
-          <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[80vh] overflow-y-auto p-6" onClick={(e) => e.stopPropagation()}>
+        <div 
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50" 
+          onClick={closeNoteDetail}
+        >
+          <div 
+            className="bg-white rounded-2xl max-w-3xl w-full max-h-[80vh] overflow-y-auto p-6 shadow-2xl" 
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex justify-between items-start mb-4">
               <div>
                 <span className={`px-2 py-1 rounded text-xs font-bold uppercase ${
@@ -344,18 +356,25 @@ export default function StudentPage() {
                   {new Date(selectedNote.created_at).toLocaleString()}
                 </p>
               </div>
-              <button onClick={closeNoteDetail} className="text-gray-400 hover:text-gray-600 text-2xl">×</button>
+              <button 
+                onClick={closeNoteDetail} 
+                className="text-gray-400 hover:text-gray-600 text-2xl font-bold p-2 leading-none"
+              >
+                ×
+              </button>
             </div>
             
-            {selectedNote.note_type === 'ai_refined' ? (
-              <article className="prose prose-blue max-w-none">
-                <ReactMarkdown>{selectedNote.content}</ReactMarkdown>
-              </article>
-            ) : (
-              <pre className="whitespace-pre-wrap text-sm text-gray-700 font-sans leading-relaxed">
-                {selectedNote.content}
-              </pre>
-            )}
+            <div className="border-t pt-4">
+              {selectedNote.note_type === 'ai_refined' ? (
+                <article className="prose prose-blue max-w-none">
+                  <ReactMarkdown>{selectedNote.content}</ReactMarkdown>
+                </article>
+              ) : (
+                <pre className="whitespace-pre-wrap text-sm text-gray-700 font-sans leading-relaxed bg-gray-50 p-4 rounded-lg">
+                  {selectedNote.content}
+                </pre>
+              )}
+            </div>
           </div>
         </div>
       )}
