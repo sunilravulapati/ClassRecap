@@ -62,8 +62,8 @@ def generate_student_notes(raw_content: str) -> str:
         response = client.chat.completions.create(
             model="google/gemini-2.0-flash-001",
             messages=[{"role": "user", "content": prompt}],
-            temperature=0.5, # Increased temperature slightly for more creativity/expansion
-            max_tokens=3000,
+            temperature=0.5,
+            max_tokens=4000, 
         )
         
         refined_notes = response.choices[0].message.content.strip()
