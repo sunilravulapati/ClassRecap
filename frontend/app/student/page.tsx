@@ -4,12 +4,7 @@ import { useState, useEffect } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-// Simple API helper
-<<<<<<< HEAD
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL;
-=======
-const API_BASE = "https://recallai-mvh8.onrender.com";
->>>>>>> 66a4f5ac224de738d24267c63111dbb13111682d
 
 const safeApi = {
   get: async (url: string) => {
