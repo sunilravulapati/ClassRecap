@@ -1,3 +1,22 @@
-# backend/.env
-# __pycache__/
-# venv/
+# ---------- ENV ----------
+.env
+.env.*
+backend/.env
+frontend/.env
+
+# ---------- PYTHON ----------
+backend/venv/
+backend/__pycache__/
+*.pyc
+
+# ---------- NODE ----------
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+
+# ---------- DATABASE ----------
+*.db
+
+# ---------- OS ----------
+.DS_Store
+Thumbs.db
