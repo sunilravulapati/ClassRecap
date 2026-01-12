@@ -6,7 +6,7 @@ from app.models.schema import SavedNote
 
 router = APIRouter()
 
-# Database Dependency
+# Simple DB Dependency (No Auth)
 def get_db():
     db = SessionLocal()
     try:
@@ -14,13 +14,12 @@ def get_db():
     finally:
         db.close()
 
-@router.get("/")
+@router.get("/")  # Removed any 'dependencies=[Depends(get_current_user)]'
 def get_class_summary(db: Session = Depends(get_db)):
     """
-    Fetches the latest student submission from the DB and generates a summary.
+    Public endpoint to fetch the latest class summary.
     """
-    # 1. Find the latest note with note_type="raw_submission"
-    # This ensures we get what the student just uploaded via the "Upload to Faculty" button
+    # 1. Fetch latest raw submission
     latest_note = (
         db.query(SavedNote)
         .filter(SavedNote.note_type == "raw_submission")
@@ -28,7 +27,6 @@ def get_class_summary(db: Session = Depends(get_db)):
         .first()
     )
 
-    # 2. If no notes exist in the DB, return the empty state
     if not latest_note:
         return {
             "topics": [],
@@ -36,6 +34,5 @@ def get_class_summary(db: Session = Depends(get_db)):
             "recap_questions": []
         }
 
-    # 3. Generate the summary using the content from the Database
-    # (Note: This might take a few seconds as it calls the AI)
+    # 2. Generate Summary
     return generate_summary(latest_note.content)
